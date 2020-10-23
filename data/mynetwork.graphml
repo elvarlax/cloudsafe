@@ -1883,7 +1883,7 @@
     </edge>
     <edge source="53018410" target="53057697" id="0">
       <data key="d9">[6327300, 6339118]</data>
-      <data key="d10">['Olive Avenue', 'Lake Avenue']</data>
+      <data key="d10">['Lake Avenue', 'Olive Avenue']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">253.49</data>
@@ -2664,7 +2664,7 @@
     </edge>
     <edge source="53041668" target="53060462" id="0">
       <data key="d9">[6396545, 6340111]</data>
-      <data key="d10">['Park Way', 'Monticello Avenue']</data>
+      <data key="d10">['Monticello Avenue', 'Park Way']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">359.543</data>
@@ -3236,7 +3236,7 @@
     </edge>
     <edge source="53060462" target="53041668" id="0">
       <data key="d9">[6396545, 6340111]</data>
-      <data key="d10">['Park Way', 'Monticello Avenue']</data>
+      <data key="d10">['Monticello Avenue', 'Park Way']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">359.54300000000006</data>
@@ -5191,7 +5191,7 @@
     </edge>
     <edge source="53092201" target="246744892" id="0">
       <data key="d9">[6377101, 6380382]</data>
-      <data key="d10">['Ashmount Avenue', 'Sea View Avenue']</data>
+      <data key="d10">['Sea View Avenue', 'Ashmount Avenue']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">180.31400000000002</data>
@@ -5397,7 +5397,7 @@
     </edge>
     <edge source="53093356" target="53114734" id="0">
       <data key="d9">[6354577, 6381575]</data>
-      <data key="d10">['Ricardo Avenue', 'Blair Avenue']</data>
+      <data key="d10">['Blair Avenue', 'Ricardo Avenue']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">90.607</data>
@@ -6232,7 +6232,7 @@
     </edge>
     <edge source="53114734" target="53093356" id="0">
       <data key="d9">[6354577, 6381575]</data>
-      <data key="d10">['Ricardo Avenue', 'Blair Avenue']</data>
+      <data key="d10">['Blair Avenue', 'Ricardo Avenue']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">90.607</data>
@@ -8071,7 +8071,7 @@
     </edge>
     <edge source="245370192" target="4606504193" id="0">
       <data key="d9">[6346890, 6350831]</data>
-      <data key="d10">['Glen Alpine Road', 'Sotelo Avenue']</data>
+      <data key="d10">['Sotelo Avenue', 'Glen Alpine Road']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">223.87399999999997</data>
@@ -8228,7 +8228,7 @@
     </edge>
     <edge source="246744892" target="53092201" id="0">
       <data key="d9">[6377101, 6380382]</data>
-      <data key="d10">['Ashmount Avenue', 'Sea View Avenue']</data>
+      <data key="d10">['Sea View Avenue', 'Ashmount Avenue']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">180.314</data>
@@ -9046,7 +9046,7 @@
     </edge>
     <edge source="4606504193" target="245370192" id="0">
       <data key="d9">[6346890, 6350831]</data>
-      <data key="d10">['Glen Alpine Road', 'Sotelo Avenue']</data>
+      <data key="d10">['Sotelo Avenue', 'Glen Alpine Road']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">223.87400000000002</data>
@@ -9092,7 +9092,7 @@
       <data key="d13">31.651</data>
       <data key="d14">LINESTRING (-122.2429793 37.8243212, -122.2430341 37.8241617, -122.2430545 37.8241024, -122.2430737 37.8240465)</data>
     </edge>
-    <data key="d0">2020-10-23 17:45:20</data>
+    <data key="d0">2020-10-23 18:05:06</data>
     <data key="d1">OSMnx 0.16.1</data>
     <data key="d2">epsg:4326</data>
     <data key="d3">True</data>
