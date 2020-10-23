@@ -2664,7 +2664,7 @@
     </edge>
     <edge source="53041668" target="53060462" id="0">
       <data key="d9">[6396545, 6340111]</data>
-      <data key="d10">['Monticello Avenue', 'Park Way']</data>
+      <data key="d10">['Park Way', 'Monticello Avenue']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">359.543</data>
@@ -3236,7 +3236,7 @@
     </edge>
     <edge source="53060462" target="53041668" id="0">
       <data key="d9">[6396545, 6340111]</data>
-      <data key="d10">['Monticello Avenue', 'Park Way']</data>
+      <data key="d10">['Park Way', 'Monticello Avenue']</data>
       <data key="d11">residential</data>
       <data key="d12">False</data>
       <data key="d13">359.54300000000006</data>
@@ -9092,7 +9092,7 @@
       <data key="d13">31.651</data>
       <data key="d14">LINESTRING (-122.2429793 37.8243212, -122.2430341 37.8241617, -122.2430545 37.8241024, -122.2430737 37.8240465)</data>
     </edge>
-    <data key="d0">2020-10-23 18:05:06</data>
+    <data key="d0">2020-10-23 18:07:41</data>
     <data key="d1">OSMnx 0.16.1</data>
     <data key="d2">epsg:4326</data>
     <data key="d3">True</data>
