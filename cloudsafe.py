@@ -1,4 +1,4 @@
-from pprint import pprint
+import pandas as pd
 import sqlite3
 from sqlite3 import Error
 
@@ -13,17 +13,11 @@ def create_connection(db_file):
 
 
 def select_all_departures(conn):
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM departures")
-    data = cursor.fetchall()
-    return data
+    return pd.read_sql("SELECT * FROM departures", conn)
 
 
 def select_all_stations(conn):
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM stations")
-    data = cursor.fetchall()
-    return data
+    return pd.read_sql("SELECT * FROM stations", conn)
 
 
 # Only for testing (Use the Jupyter Notebook for Visualization)
@@ -34,7 +28,7 @@ if __name__ == "__main__":
     departures = select_all_departures(conn)
     stations = select_all_stations(conn)
 
-    pprint(departures)
-    pprint(stations)
+    print(departures)
+    print(stations)
 
     conn.close()
