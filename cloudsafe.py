@@ -31,10 +31,6 @@ def select_all_bus_stops():
     return gpd.read_file('here-api/bus-stops.geojson')
 
 
-def frequency(df):
-    return df.value_counts()
-
-
 def get_coords(row):
     if row['coordinates_here']:
         coords = row['coordinates_here'].split(',')
