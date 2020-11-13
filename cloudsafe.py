@@ -1,14 +1,7 @@
 import sqlite3
-from datetime import datetime
 from sqlite3 import Error
 
-import folium
-import geopandas as gpd
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import pandas as pd
-
-from utils.folium_utils import get_geojson_grid
 
 
 def create_connection(db_file):
@@ -18,6 +11,12 @@ def create_connection(db_file):
     except Error as e:
         print(e)
     return conn
+
+
+def filter_by_hour(df, start, end):
+    start = pd.to_datetime(start, format='%H:%M')
+    end = pd.to_datetime(end, format='%H:%M')
+    return df[start >= df['time'] < end]
 
 
 def select_all_departures(conn):
@@ -30,7 +29,7 @@ def select_all_stations(conn):
 
 def select_stations_join_departures(conn):
     df = pd.read_sql("SELECT * FROM stations INNER JOIN departures d on stations.id = d.station_id", conn)
-    # df['time'] = df['time'].apply(datetime.strptime(df['time'], '%H:%M').time())
+    df['time'] = pd.to_datetime(df['time'], format='%H:%M')
     return df
 
 
@@ -45,5 +44,6 @@ def get_coords(row):
 if __name__ == "__main__":
     database = 'here-api/main.db'
     conn = create_connection(database)
-    stations_with_departures = select_stations_join_departures(conn)
-    print(stations_with_departures)
+    stations = select_stations_join_departures(conn)
+    stations_between_10_and_11 = filter_by_hour(stations, "10:00", "11:00")
+    print(stations_between_10_and_11)
