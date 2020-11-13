@@ -27,8 +27,8 @@ def select_all_stations(conn):
     return pd.read_sql("SELECT * FROM stations", conn)
 
 
-def select_all_bus_stops():
-    return gpd.read_file('here-api/bus-stops.geojson')
+def select_stations_join_departures(conn):
+    return pd.read_sql("SELECT * FROM stations INNER JOIN departures d on stations.id = d.station_id", conn)
 
 
 def get_coords(row):
@@ -40,4 +40,7 @@ def get_coords(row):
 
 # Only for testing (Use the Jupyter Notebook for Visualization)
 if __name__ == "__main__":
-    pass
+    database = 'here-api/main.db'
+    conn = create_connection(database)
+    stations_with_departures = select_stations_join_departures(conn)
+    print(stations_with_departures)
