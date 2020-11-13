@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 from sqlite3 import Error
 
 import folium
@@ -28,7 +29,9 @@ def select_all_stations(conn):
 
 
 def select_stations_join_departures(conn):
-    return pd.read_sql("SELECT * FROM stations INNER JOIN departures d on stations.id = d.station_id", conn)
+    df = pd.read_sql("SELECT * FROM stations INNER JOIN departures d on stations.id = d.station_id", conn)
+    # df['time'] = df['time'].apply(datetime.strptime(df['time'], '%H:%M').time())
+    return df
 
 
 def get_coords(row):
