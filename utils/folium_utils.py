@@ -1,4 +1,8 @@
 import numpy 
+import folium
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import pandas as pd
 # https://www.jpytr.com/post/analysinggeographicdatawithfolium/
 def get_geojson_grid(upper_right, lower_left, n=6):
     """Returns a grid of geojson rectangles, and computes the exposure in each section of the grid based on the vessel data.
@@ -66,3 +70,54 @@ def get_geojson_grid(upper_right, lower_left, n=6):
             all_boxes.append(geo_json)
 
     return all_boxes
+
+def get_coords(row):
+    if row['coordinates_here']:
+        coords = row['coordinates_here'].split(',')
+        return coords[0], coords[1]
+    return None, None
+
+def get_copenhagen_grid(stations):
+    coords = stations.iloc[0].coordinates_here.split(',')
+    m = folium.Map([coords[0], coords[1]], zoom_start=10)
+    stations[['latitude', 'longitude']] = stations.apply(get_coords, axis=1, result_type="expand")
+    frequencies = stations.name_overpass.value_counts()
+    rows = []
+    for station in frequencies.keys():
+        first = stations.loc[stations['name_overpass'] == station].iloc[0]
+        rows.append({'station_name': station,
+                    'longitude': first.longitude,
+                    'latitude': first.latitude,
+                    'bus_count': frequencies.get(station)})
+
+    final = pd.DataFrame(rows)
+    final['longitude'] = final['longitude'].astype(float)
+    final['latitude'] = final['latitude'].astype(float)
+    top_right = [final['latitude'].max(), final['longitude'].max()]
+    bottom_left = [final['latitude'].min(), final['longitude'].min()]
+    grid = get_geojson_grid(top_right, bottom_left, n=10)
+    counts = []
+    for box in grid:
+        upper_right = box["properties"]["upper_right"]
+        lower_left = box["properties"]["lower_left"]
+        items = final.loc[(final['latitude'] <= upper_right[1]) &
+                        (final['longitude'] <= upper_right[0]) &
+                        (final['longitude'] >= lower_left[0]) &
+                        (final['latitude'] >= lower_left[1])]
+        counts.append(len(items))
+    max_count = max(counts)
+    for i, geo_json in enumerate(grid):
+        color = plt.cm.Reds(counts[i] / max_count)
+        color = mpl.colors.to_hex(color)
+        gj = folium.GeoJson(geo_json,
+                            style_function=lambda feature, 
+                            color=color: {
+                                'fillColor': color,
+                                'color': "black",
+                                'weight': 2,
+                                'dashArray': '5, 5',
+                                'fillOpacity': 0.55,
+                            })
+
+        m.add_child(gj)
+    return m

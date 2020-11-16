@@ -35,14 +35,6 @@ def select_stations_join_departures(conn):
     df['time'] = text_to_datetime(df['time'])
     return df
 
-
-def get_coords(row):
-    if row['coordinates_here']:
-        coords = row['coordinates_here'].split(',')
-        return coords[0], coords[1]
-    return None, None
-
-
 # Only for testing (Use the Jupyter Notebook for Visualization)
 if __name__ == "__main__":
     database = 'here-api/main.db'
