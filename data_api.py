@@ -2,8 +2,15 @@
 This script contains functions that retrieve data from the db in order to be further processed or displayed.
 """
 
-import geojson
 import sqlite3
+import pandas as pd
+import folium
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+# https://towardsdatascience.com/interactive-controls-for-jupyter-notebooks-f5c94829aee6
+import ipywidgets as widgets
+from ipywidgets import interact, interact_manual
+from utils.folium_utils import get_copenhagen_grid, get_geojson_grid, get_coords
 
 
 def get_bus_ids():
@@ -18,7 +25,10 @@ def get_bus_ids():
 
     stmt = 'SELECT id FROM buses;'
     bus_ids = cursor.execute(stmt).fetchall()
-    
+
+    cursor.close()
+    conn.close()
+
     return [bus_id[0] for bus_id in bus_ids]
 
 
@@ -50,7 +60,7 @@ def get_routes_geojson(bus_ids=None, flip_coordinates=True):
         buses = cursor.execute(stmt).fetchall()
     else:
         stmt = f"""SELECT id, name, from_station_name, to_station_name FROM buses 
-            WHERE id IN ({','.join(['?']*len(bus_ids))});"""
+            WHERE id IN ({','.join(['?'] * len(bus_ids))});"""
         buses = cursor.execute(stmt, bus_ids).fetchall()
 
     for bus in buses:
@@ -60,7 +70,9 @@ def get_routes_geojson(bus_ids=None, flip_coordinates=True):
         for segment in segments:
             stmt_sub = 'SELECT coordinates FROM routes_points WHERE bus_id = ? AND segment = ? ORDER BY segment, seq;'
             coordinates = cursor.execute(stmt_sub, (bus[0], segment[0])).fetchall()
-            coordinates_list.append([list(map(float, row[0].split(',')[::-1] if flip_coordinates else row[0].split(','))) for row in coordinates])
+            coordinates_list.append(
+                [list(map(float, row[0].split(',')[::-1] if flip_coordinates else row[0].split(','))) for row in
+                 coordinates])
 
         route = {
             "type": "Feature",
@@ -110,9 +122,9 @@ def get_grid_geojson(flip_coordinates=True):
 
     for cell in cursor.execute(stmt).fetchall():
         coordinates_list = [
-            list(map(float, cell[2].split(',')[::-1] if flip_coordinates else cell[2].split(','))), 
-            list(map(float,cell[3].split(',')[::-1] if flip_coordinates else cell[3].split(','))), 
-            list(map(float, cell[4].split(',')[::-1] if flip_coordinates else cell[4].split(','))), 
+            list(map(float, cell[2].split(',')[::-1] if flip_coordinates else cell[2].split(','))),
+            list(map(float, cell[3].split(',')[::-1] if flip_coordinates else cell[3].split(','))),
+            list(map(float, cell[4].split(',')[::-1] if flip_coordinates else cell[4].split(','))),
             list(map(float, cell[5].split(',')[::-1] if flip_coordinates else cell[5].split(',')))
         ]
         cell = {
@@ -156,7 +168,7 @@ def get_route_cells(bus_ids=None):
         route_cells = cursor.execute(stmt).fetchall()
     else:
         stmt = f"""SELECT bus_id, x_axis, y_axis FROM routes_cells rc, grid_cells gc 
-            WHERE rc.cell_id = gc.id AND bus_id IN ({','.join(['?']*len(bus_ids))});"""
+            WHERE rc.cell_id = gc.id AND bus_id IN ({','.join(['?'] * len(bus_ids))});"""
         route_cells = cursor.execute(stmt, bus_ids).fetchall()
 
     route_cells_agg = {}
@@ -164,8 +176,43 @@ def get_route_cells(bus_ids=None):
         if route_cell[0] not in route_cells_agg.keys():
             route_cells_agg[route_cell[0]] = []
         route_cells_agg[route_cell[0]].append((route_cell[1], route_cell[2]))
-    
+
+    cursor.close()
+    conn.close()
+
     return route_cells_agg
+
+
+def text_to_datetime(text):
+    return pd.to_datetime(text, format='%H:%M')
+
+
+def filter_by_hour(df, start, end):
+    start = text_to_datetime(start)
+    end = text_to_datetime(end)
+    return df[(df['time'] >= start) & (df['time'] < end)]
+
+
+def select_all_departures():
+    conn = sqlite3.connect('data/main.db')
+    all_departures = pd.read_sql("SELECT * FROM departures", conn)
+    conn.close()
+    return all_departures
+
+
+def select_all_stations():
+    conn = sqlite3.connect('data/main.db')
+    all_stations = pd.read_sql("SELECT * FROM stations", conn)
+    conn.close()
+    return all_stations
+
+
+def select_stations_join_departures():
+    conn = sqlite3.connect('data/main.db')
+    stations_departures = pd.read_sql("SELECT * FROM stations s INNER JOIN departures d on s.id = d.station_id", conn)
+    stations_departures['time'] = text_to_datetime(stations_departures['time'])
+    conn.close()
+    return stations_departures
 
 
 if __name__ == '__main__':
@@ -173,4 +220,7 @@ if __name__ == '__main__':
     For testing.
     """
     bus_ids = [51, 50, 31, 32, 4, 38, 30, 26, 13, 49, 40, 6, 29, 20, 10, 41, 3, 58, 7]
+    stations = select_stations_join_departures()
+    stations_filtered = filter_by_hour(stations, "08:00", "09:00")
     print(get_route_cells(bus_ids))
+    print(stations_filtered)
