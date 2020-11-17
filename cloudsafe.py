@@ -37,7 +37,7 @@ def select_stations_join_departures(conn):
 
 # Only for testing (Use the Jupyter Notebook for Visualization)
 if __name__ == "__main__":
-    database = 'here-api/main.db'
+    database = 'data/main.db'
     conn = create_connection(database)
     stations = select_stations_join_departures(conn)
     stations_filtered = filter_by_hour(stations, "08:00", "09:00")
