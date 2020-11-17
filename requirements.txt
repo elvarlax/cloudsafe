@@ -2,7 +2,10 @@
 numpy==1.19.4
 folium==0.11.0
 pandas==1.1.4
-matplotlib==3.3.2
+matplotlib==3.3.3
 tqdm==4.52.0
 Shapely==1.7.1
 ipywidgets==7.5.1
+requests==2.25.0
+geopandas==0.8.1
+geojson==2.5.0
