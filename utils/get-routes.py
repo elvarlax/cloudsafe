@@ -3,9 +3,10 @@ Extracts the buses and routes from bus-routes.geojson and saves them to the db
 in the tables 'buses' and 'routes_points'.
 """
 
+import sqlite3
+
 import geojson
 from tqdm import tqdm
-import sqlite3
 
 with open('../data/bus-routes.geojson', 'r') as f:
     gj = geojson.load(f)
@@ -31,7 +32,7 @@ for item in gj['features']:
     except:
         bus['to'] = None
     bus['route'] = []
-    
+
     if item['geometry']['type'] == 'LineString':
         segment = []
         for point in item['geometry']['coordinates']:
@@ -44,7 +45,6 @@ for item in gj['features']:
                 segment.append(point[::-1])
             bus['route'].append(segment)
     buses.append(bus)
-
 
 conn = sqlite3.connect('../data/main.db')
 cursor = conn.cursor()
@@ -61,7 +61,7 @@ for bus in tqdm(buses):
     bus_id = cursor.lastrowid
     for segment_index, segment in enumerate(bus['route']):
         for point_index, point in enumerate(segment):
-            data = (bus_id, segment_index+1, ','.join(map(str, point)), point_index+1)
+            data = (bus_id, segment_index + 1, ','.join(map(str, point)), point_index + 1)
             cursor.execute(stmt_routes, data)
 
 conn.commit()

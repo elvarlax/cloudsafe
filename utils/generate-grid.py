@@ -6,9 +6,10 @@ Adjust upper_right, lower_left and n based on your needs.
 """
 # https://www.jpytr.com/post/analysinggeographicdatawithfolium/
 
+import sqlite3
+
 import numpy
 from shapely.geometry import Point, Polygon
-import sqlite3
 from tqdm import tqdm
 
 upper_right = [55.716668, 12.583234]
@@ -20,15 +21,14 @@ cursor = conn.cursor()
 stmt = """INSERT INTO grid_cells (x_axis, y_axis, upper_left, upper_right, lower_right, lower_left) 
     VALUES (?, ?, ?, ?, ?, ?);"""
 
-lat_steps = numpy.linspace(lower_left[0], upper_right[0], n+1)
-lon_steps = numpy.linspace(lower_left[1], upper_right[1], n+1)
+lat_steps = numpy.linspace(lower_left[0], upper_right[0], n + 1)
+lon_steps = numpy.linspace(lower_left[1], upper_right[1], n + 1)
 
 lat_stride = lat_steps[1] - lat_steps[0]
 lon_stride = lon_steps[1] - lon_steps[0]
 
 for lat_index, lat in enumerate(lat_steps[:-1]):
     for lon_index, lon in enumerate(lon_steps[:-1]):
-
         upper_left = ','.join(map(str, [lat + lat_stride, lon]))
         upper_right = ','.join(map(str, [lat + lat_stride, lon + lon_stride]))
         lower_right = ','.join(map(str, [lat, lon + lon_stride]))
@@ -51,9 +51,9 @@ stmt_insert = 'INSERT INTO routes_cells (bus_id, cell_id, seq) VALUES (?, ?, ?);
 for point_index, point in enumerate(tqdm(routes)):
     for cell in cells:
         point_obj = Point(map(float, point[1].split(',')))
-        poly_obj = Polygon(map(list, [map(float, cell[1].split(',')), map(float, cell[2].split(',')), 
-            map(float, cell[3].split(',')), map(float, cell[4].split(','))]))
-        
+        poly_obj = Polygon(map(list, [map(float, cell[1].split(',')), map(float, cell[2].split(',')),
+                                      map(float, cell[3].split(',')), map(float, cell[4].split(','))]))
+
         if not point_obj.within(poly_obj):
             continue
 

@@ -5,10 +5,10 @@ This data can be further linked to each bus in order to get their estimated loca
 It needs a valid OAuth2 token provided by Here after a successfull authentication.
 """
 
-import geojson
-import requests
-import sqlite3
 import datetime
+import sqlite3
+
+import requests
 from tqdm import tqdm
 
 token = 'replace-me'
