@@ -1,4 +1,4 @@
-# pip requirements for venv
+# pip requirements
 numpy==1.19.4
 folium==0.11.0
 pandas==1.1.4
