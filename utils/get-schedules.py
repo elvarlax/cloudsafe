@@ -2,6 +2,9 @@ import geojson
 import requests
 import sqlite3
 import datetime
+import sqlite3
+
+import requests
 from tqdm import tqdm
 from pathlib import Path
 

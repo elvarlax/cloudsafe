@@ -1,6 +1,5 @@
 import numpy
 from shapely.geometry import Point, Polygon
-import sqlite3
 from tqdm import tqdm
 from pathlib import Path
 
