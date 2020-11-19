@@ -1,3 +1,4 @@
+import sqlite3
 import numpy
 from shapely.geometry import Point, Polygon
 from tqdm import tqdm
@@ -43,8 +44,8 @@ def generate_grid(upper_right, lower_left, n):
     stmt_insert = """INSERT INTO grid_cells (x_axis, y_axis, upper_left, upper_right, lower_right, lower_left) 
         VALUES (?, ?, ?, ?, ?, ?);"""
 
-    lat_steps = numpy.linspace(lower_left[0], upper_right[0], n+1)
-    lon_steps = numpy.linspace(lower_left[1], upper_right[1], n+1)
+    lat_steps = numpy.linspace(lower_left[0], upper_right[0], n + 1)
+    lon_steps = numpy.linspace(lower_left[1], upper_right[1], n + 1)
 
     lat_stride = lat_steps[1] - lat_steps[0]
     lon_stride = lon_steps[1] - lon_steps[0]
@@ -68,7 +69,7 @@ def generate_grid(upper_right, lower_left, n):
     stmt_check = 'SELECT count(*) FROM routes_cells WHERE bus_id = ? AND cell_id = ?;'
     stmt_insert = 'INSERT INTO routes_cells (bus_id, cell_id, seq) VALUES (?, ?, ?);'
 
-    for point_index, point in enumerate(tqdm(routes)):
+    for point in enumerate(tqdm(routes)):
         for cell in cells:
             point_obj = Point(map(float, point[1].split(',')))
             poly_obj = Polygon(map(list, [

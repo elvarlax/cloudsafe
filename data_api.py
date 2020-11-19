@@ -6,13 +6,11 @@ import sqlite3
 from tqdm import tqdm
 import json
 import pandas as pd
-# import folium
+import folium
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-# https://towardsdatascience.com/interactive-controls-for-jupyter-notebooks-f5c94829aee6
-# import ipywidgets as widgets
-# from ipywidgets import interact, interact_manual
-# from utils.folium_utils import get_copenhagen_grid, get_geojson_grid, get_coords
+
+
 from pathlib import Path
 
 db = Path.cwd() / 'data/main.db'
