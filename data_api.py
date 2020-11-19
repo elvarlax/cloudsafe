@@ -216,13 +216,6 @@ def get_route_cells(bus_ids):
     return route_cells_agg
 
 
-def merge_geojson(geo_routes, geo_grid):
-    map = folium.Map(location=[55.676098, 12.568337], zoom_start=12)  # Starting map
-    folium.GeoJson(geo_routes).add_to(map)  # Routes layer
-    folium.GeoJson(geo_grid).add_to(map)  # Grid layer
-    return map
-
-
 def text_to_datetime(text):
     return pd.to_datetime(text, format='%H:%M')
 
