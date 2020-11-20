@@ -160,7 +160,7 @@ def get_grid_geojson(bus_ids, time_range, flip_coordinates=True, stations_source
         subset = buses_count_subset[cell[0]] if cell[0] in buses_count_subset else 0
         total = buses_count_total[cell[0]] if cell[0] in buses_count_total else 0
 
-        cell_color = plt.cm.get_cmap('Blues')(subset / total if total else 0)
+        cell_color = plt.cm.get_cmap('Reds')(subset / total if total else 0)
         cell_color = mpl.colors.to_hex(cell_color)
 
         cell = {
