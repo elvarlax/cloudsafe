@@ -2,16 +2,16 @@
 This script contains functions that retrieve data from the db in order to be further processed or displayed.
 """
 
-import sqlite3
-from tqdm import tqdm
+import datetime
 import json
-import pandas as pd
+import sqlite3
+from pathlib import Path
+
 import folium
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from datetimerange import DateTimeRange
-import datetime
-from pathlib import Path
+from folium.plugins import TimestampedGeoJson
 
 db = Path.cwd() / 'data/main.db'
 
@@ -119,35 +119,34 @@ def get_grid_geojson(bus_ids, time_range, flip_coordinates=True, stations_source
 
     conn = sqlite3.connect(db)
     cursor = conn.cursor()
-    
+
     if stations_source == 'overpass':
         stmt_buses_subset = f"""SELECT cell_id, substr(time, 0, 3) AS interval, count(*) FROM departures d, stations_cells_overpass sc 
             WHERE d.station_id = sc.station_id AND bus_id IN ({','.join(['?'] * len(bus_ids))}) AND day = ? AND time BETWEEN ? AND ? 
             GROUP BY cell_id, interval;"""
-        
+
         stmt_buses_all = f"""SELECT cell_id, substr(time, 0, 3) as interval, count(*) FROM departures d, stations_cells_overpass sc 
             WHERE d.station_id = sc.station_id AND day = ? AND time BETWEEN ? AND ? GROUP BY cell_id, interval;"""
-    
+
     elif stations_source == 'here':
         stmt_buses_subset = f"""SELECT cell_id, substr(time, 0, 3) as interval, count(*) FROM departures d, stations_cells_here sc 
             WHERE d.station_id = sc.station_id AND bus_id IN ({','.join(['?'] * len(bus_ids))}) AND day = ? AND time BETWEEN ? AND ? 
             GROUP BY cell_id, interval;"""
-        
+
         stmt_buses_all = f"""SELECT cell_id, substr(time, 0, 3) as interval, count(*) FROM departures d, stations_cells_here sc 
             WHERE d.station_id = sc.station_id AND day = ? AND time BETWEEN ? AND ? GROUP BY cell_id, interval;"""
-   
+
     else:
         cursor.close()
         conn.close()
         raise Exception('Invalid stations_source!')
-
 
     buses_count_subset = {}
     for cell, interval, count in cursor.execute(stmt_buses_subset, (*bus_ids, *time_range)).fetchall():
         d = {}
         d[interval] = count
         buses_count_subset.setdefault(cell, {}).update(d)
-    
+
     buses_count_total = {}
     for cell, interval, count in cursor.execute(stmt_buses_all, [*time_range]).fetchall():
         d = {}
@@ -187,8 +186,8 @@ def get_grid_geojson(bus_ids, time_range, flip_coordinates=True, stations_source
             else:
                 total = 0
 
-            perc = subset/total if total else 1
-            cell_color = plt.cm.get_cmap('Reds')(perc * 5) # 5 - to increase the shade
+            perc = subset / total if total else 1
+            cell_color = plt.cm.get_cmap('Reds')(perc * 5)  # 5 - to increase the shade
             cell_color = mpl.colors.to_hex(cell_color)
             perc = round(perc * 100, 2)
 
@@ -254,47 +253,40 @@ def get_route_cells(bus_ids):
     return route_cells_agg
 
 
-def text_to_datetime(text):
-    return pd.to_datetime(text, format='%H:%M')
-
-
-def filter_by_hour(df, start, end):
-    start = text_to_datetime(start)
-    end = text_to_datetime(end)
-    return df[(df['time'] >= start) & (df['time'] < end)]
-
-
-def select_all_departures():
-    conn = sqlite3.connect(db)
-    all_departures = pd.read_sql("SELECT * FROM departures", conn)
-    conn.close()
-    return all_departures
-
-
-def select_all_stations():
-    conn = sqlite3.connect(db)
-    all_stations = pd.read_sql("SELECT * FROM stations", conn)
-    conn.close()
-    return all_stations
-
-
-def select_stations_join_departures():
-    conn = sqlite3.connect(db)
-    stations_departures = pd.read_sql("SELECT * FROM stations s INNER JOIN departures d on s.id = d.station_id", conn)
-    stations_departures['time'] = text_to_datetime(stations_departures['time'])
-    conn.close()
-    return stations_departures
-
-
 if __name__ == '__main__':
-    # bus_ids = [13, 6]
-    # get_grid_geojson(bus_ids, ('weekday', '01:00', '10:00'))
+    bus_ids = [13, 6]
+    get_grid_geojson(bus_ids, ('weekday', '01:00', '10:00'))
     data = get_routes_geojson([10])
+
     with open('anotherone.json', 'w') as f:
         json.dump(data, f)
-    # print(json.dumps(get_routes_geojson(bus_ids)))
-    # bus_ids = [51, 50, 31, 32, 4, 38, 30, 26, 13, 49, 40, 6, 29, 20, 10, 41, 3, 58, 7]
-    # stations = select_stations_join_departures()
-    # stations_filtered = filter_by_hour(stations, "08:00", "09:00")
-    # print(get_route_cells(bus_ids))
-    # print(stations_filtered)
+
+    print(json.dumps(get_routes_geojson(bus_ids)))
+
+    bus_ids = [51, 50, 31, 32, 4, 38, 30, 26, 13, 49, 40, 6, 29, 20, 10, 41, 3, 58, 7]
+    routes_gj = get_routes_geojson(bus_ids)
+    grid_gj = get_grid_geojson(bus_ids, ('weekday', '00:00', '23:59'), stations_source='here')
+    m = folium.Map(location=[55.6795535, 12.542231], zoom_start=13, tiles='OpenStreetMap')
+    routes = folium.GeoJson(routes_gj, name='routes', style_function=lambda feature: {
+        'color': 'blue'
+    })
+
+    grid = TimestampedGeoJson(
+        grid_gj,
+        period='PT1H',
+        duration='PT1M',
+        date_options='HH:mm',
+        auto_play=False,
+        max_speed=1,
+        loop=False,
+        time_slider_drag_update=True,
+        loop_button=True
+    )
+
+    routes.add_to(m)
+    grid.add_to(m)
+
+    folium.features.GeoJsonTooltip(fields=['bus_id', 'name'], aliases=['id', 'bus']).add_to(routes)
+    folium.LayerControl().add_to(m)
+
+    print(m)
