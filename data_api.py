@@ -186,8 +186,8 @@ def get_grid_geojson(bus_ids, time_range, flip_coordinates=True, stations_source
             else:
                 total = 0
 
-            perc = subset / total if total else 1
-            cell_color = plt.cm.get_cmap('Reds')(perc * 5)  # 5 - to increase the shade
+            perc = subset / total if total else 0
+            cell_color = plt.cm.get_cmap('Reds')(perc * 1.5)  # 5 - to increase the shade
             cell_color = mpl.colors.to_hex(cell_color)
             perc = round(perc * 100, 2)
 
